@@ -1,4 +1,4 @@
-package com.medvedomg.flickrsearchapp.presentation.spots
+package com.medvedomg.flickrsearchapp.presentation.search
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import com.medvedomg.flickrsearchapp.domain.util.Result
 
 class SearchViewModel(
-    private val getSpotsUseCase: GetImagesUseCase
+    private val getImagesUseCase: GetImagesUseCase
 ) : ViewModel() {
 
     private val _viewStateLiveData =
@@ -19,7 +19,7 @@ class SearchViewModel(
 
     fun loadData(tags: String) {
         viewModelScope.launch {
-            when (val result = getSpotsUseCase(tags)) {
+            when (val result = getImagesUseCase(tags)) {
                 is Result.Success -> {
                     val list = result.data.items.map {
                         ImageModel(
@@ -41,5 +41,9 @@ class SearchViewModel(
                 }
             }
         }
+    }
+
+    fun startLoading() {
+        _viewStateLiveData.postValue(ViewState.Loading)
     }
 }

@@ -1,15 +1,13 @@
-package com.medvedomg.flickrsearchapp.presentation.spots
+package com.medvedomg.flickrsearchapp.presentation.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.medvedomg.flickrsearchapp.R
 import com.medvedomg.flickrsearchapp.databinding.FragmentSearchBinding
 import com.medvedomg.flickrsearchapp.presentation.image_details.ImageDetailsFragment
@@ -24,12 +22,12 @@ class SearchFragment : Fragment() {
     private lateinit var binding: FragmentSearchBinding
 
     private val adapter by lazy {
-        ImageAdapter { spotModel ->
+        ImageAdapter { imageModel ->
             requireActivity().supportFragmentManager.commit {
                 val tag = ImageDetailsFragment::class.simpleName
                 replace(
                     R.id.rootContainer,
-                    ImageDetailsFragment.newInstance(spotModel),
+                    ImageDetailsFragment.newInstance(imageModel),
                     tag
                 )
                 addToBackStack(tag)
@@ -50,31 +48,28 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with(binding.recyclerView) {
             adapter = this@SearchFragment.adapter
-            val lm = LinearLayoutManager(requireContext())
+            val lm = GridLayoutManager(requireContext(), 2)
             layoutManager = lm
-            val dividerItemDecoration = DividerItemDecoration(
-                context,
-                lm.orientation
-            )
-            addItemDecoration(dividerItemDecoration)
         }
-        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
+        with(binding.search) {
+            isSubmitButtonEnabled = true
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    viewModel.loadData(query.toString())
+                    return false
+                }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.loadData(newText.toString())
-                return false
-            }
-        })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    if (newText.orEmpty().isNotBlank()) {
+                        viewModel.startLoading()
+                    }
+                    return false
+                }
+            })
+        }
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             setState(it)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        requireActivity().title = "Search"
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     private fun setState(state: ViewState<List<ImageModel>>) {
@@ -82,6 +77,8 @@ class SearchFragment : Fragment() {
 
             when (state) {
                 is ViewState.Success -> {
+                    search.setQuery("", false)
+                    search.clearFocus()
                     loader.visibility = View.GONE
                     tvError.visibility = View.GONE
                     adapter.setData(state.data)

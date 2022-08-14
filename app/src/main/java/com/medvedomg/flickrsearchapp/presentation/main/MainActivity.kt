@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.medvedomg.flickrsearchapp.databinding.ActivityMainBinding
-import com.medvedomg.flickrsearchapp.presentation.spots.SearchFragment
+import com.medvedomg.flickrsearchapp.presentation.search.SearchFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {

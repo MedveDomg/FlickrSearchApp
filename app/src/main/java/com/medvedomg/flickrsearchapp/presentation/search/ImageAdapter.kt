@@ -1,10 +1,10 @@
-package com.medvedomg.flickrsearchapp.presentation.spots
+package com.medvedomg.flickrsearchapp.presentation.search
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.medvedomg.flickrsearchapp.R
 import com.medvedomg.flickrsearchapp.databinding.ImageViewholderBinding
 
 class ImageAdapter(val onClickCallback: (ImageModel) -> Unit) :
@@ -40,7 +40,9 @@ class ImageAdapter(val onClickCallback: (ImageModel) -> Unit) :
 
         fun bind(imageModel: ImageModel) {
             with(binding) {
-                iv.load(imageModel.link)
+                iv.load(imageModel.link) {
+                    error(R.drawable.ic_baseline_error_24)
+                }
                 tvTitle.text = imageModel.title
                 root.setOnClickListener {
                     onClickCallback(imageModel)
