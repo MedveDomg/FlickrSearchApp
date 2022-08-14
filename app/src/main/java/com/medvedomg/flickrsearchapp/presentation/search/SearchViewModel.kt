@@ -17,6 +17,10 @@ class SearchViewModel(
         MutableLiveData<ViewState<List<ImageModel>>>(ViewState.Loading)
     val viewStateLiveData = _viewStateLiveData.asLiveData()
 
+    init {
+        loadData("car")
+    }
+
     fun loadData(tags: String) {
         viewModelScope.launch {
             when (val result = getImagesUseCase(tags)) {

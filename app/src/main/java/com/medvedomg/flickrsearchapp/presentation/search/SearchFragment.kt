@@ -74,7 +74,6 @@ class SearchFragment : Fragment() {
 
     private fun setState(state: ViewState<List<ImageModel>>) {
         with(binding) {
-
             when (state) {
                 is ViewState.Success -> {
                     search.setQuery("", false)
@@ -85,6 +84,8 @@ class SearchFragment : Fragment() {
                     recyclerView.visibility = View.VISIBLE
                 }
                 is ViewState.Error -> {
+                    search.setQuery("", false)
+                    search.clearFocus()
                     loader.visibility = View.GONE
                     tvError.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
